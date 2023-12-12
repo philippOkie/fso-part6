@@ -3,7 +3,7 @@ import { vote } from "../reducers/anecdoteReducer";
 
 const Anecdotes = () => {
   const dispatch = useDispatch();
-  const anecdotes = useSelector((state) => state);
+  const anecdotes = useSelector((state) => state.anecdotes);
 
   const onClickVote = (id) => {
     console.log("vote", id);
@@ -12,7 +12,6 @@ const Anecdotes = () => {
 
   return (
     <div>
-      <h2>Anecdotes</h2>
       {anecdotes.map((anecdote) => (
         <div key={anecdote.id}>
           <div>{anecdote.content}</div>
