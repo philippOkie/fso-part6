@@ -1,3 +1,5 @@
+import { createSlice } from "@reduxjs/toolkit";
+
 const anecdotesAtStart = [
   "If it hurts, do it more often",
   "Adding manpower to a late software project makes it later!",
@@ -17,72 +19,44 @@ const asObject = (anecdote) => {
   };
 };
 
-export const initialState = anecdotesAtStart.map(asObject);
+const initialState = anecdotesAtStart.map(asObject);
 
-export const createAnecdote = (content) => {
-  return {
-    type: "NEW_ANECDOTE",
-    payload: {
-      content,
-      id: getId(),
-      votes: 0,
+const anecdotesSlice = createSlice({
+  name: "anecdotes",
+  initialState,
+  reducers: {
+    createAnecdote: {
+      reducer: (state, action) => {
+        state.push(action.payload);
+      },
+      prepare: (content) => {
+        return {
+          payload: {
+            content,
+            id: getId(),
+            votes: 0,
+          },
+        };
+      },
     },
-  };
-};
-
-export const vote = (id) => {
-  return {
-    type: "VOTE",
-    payload: {
-      id: id,
-    },
-  };
-};
-
-export const filter = (str) => {
-  return {
-    type: "FILTER",
-    payload: {
-      str: str,
-    },
-  };
-};
-
-const reducer = (state = initialState, action) => {
-  console.log("state now: ", state);
-  console.log("action", action);
-
-  switch (action.type) {
-    case "FILTER": {
-      const str = action.payload.str;
-      if (str === "") {
-        return initialState;
-      }
-      const anecdotesFiltered = state.filter((anecdote) =>
-        anecdote.content.includes(str)
-      );
-      return anecdotesFiltered;
-    }
-    case "NEW_ANECDOTE":
-      return [...state, action.payload];
-    case "VOTE": {
-      const id = action.payload.id;
-      const anecdoteToChange = state.find((a) => a.id === id);
-      const changedAnecdote = {
-        ...anecdoteToChange,
-        votes: anecdoteToChange.votes + 1,
-      };
-      const newState = state.map((anecdote) =>
-        anecdote.id !== id ? anecdote : changedAnecdote
-      );
-      newState.sort((a, b) =>
+    vote: (state, action) => {
+      const anecdoteToChange = state.find((a) => a.id === action.payload);
+      anecdoteToChange.votes += 1;
+      state.sort((a, b) =>
         b.votes > a.votes ? 1 : a.votes > b.votes ? -1 : 0
       );
-      return newState;
-    }
-    default:
-      return state;
-  }
-};
+    },
+    filter: (state, action) => {
+      if (action.payload === "") {
+        return initialState;
+      }
+      return state.filter((anecdote) =>
+        anecdote.content.includes(action.payload)
+      );
+    },
+  },
+});
 
-export default reducer;
+export const { createAnecdote, vote, filter } = anecdotesSlice.actions;
+
+export default anecdotesSlice.reducer;
