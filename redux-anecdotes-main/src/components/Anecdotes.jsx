@@ -4,13 +4,16 @@ import {
   setNotification,
   removeNotification,
 } from "../reducers/notificationReducer";
+import anecdoteService from "../services/anecdotes";
 
 const Anecdotes = () => {
   const dispatch = useDispatch();
   const anecdotes = useSelector((state) => state.anecdotes);
 
-  const onClickVote = (id, content) => {
+  const onClickVote = async (id, content) => {
     console.log("vote", id);
+
+    await anecdoteService.updateVotes(id);
     dispatch(vote(id));
     dispatch(setNotification(`You voted for anecdote ${content}`));
     setInterval(() => {

@@ -23,4 +23,4 @@ const updateVotes = async (id) => {
   return updatedResponse.data;
 };
 
-export default { getAll, createNew };
+export default { getAll, createNew, updateVotes };
