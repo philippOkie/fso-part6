@@ -2,9 +2,11 @@ import AnecdoteForm from "./components/AnecdoteForm";
 import Notification from "./components/Notification";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAnecdotes, updateAnecdote } from "./request";
+import { useNotificationDispatch } from "../NotificationContext";
 
 const App = () => {
   const queryClient = useQueryClient();
+  const dispatch = useNotificationDispatch();
 
   const updateAnecdoteMutation = useMutation({
     mutationFn: updateAnecdote,
@@ -19,6 +21,10 @@ const App = () => {
       votes: anecdote.votes + 1,
     });
     console.log("vote");
+    dispatch({ type: "VOTE", payload: anecdote.content });
+    setTimeout(() => {
+      dispatch({ type: "CLEAN" });
+    }, 5000);
   };
 
   const result = useQuery({
@@ -50,7 +56,13 @@ const App = () => {
           <div>{anecdote.content}</div>
           <div>
             has {anecdote.votes}
-            <button onClick={() => handleVote(anecdote)}>vote</button>
+            <button
+              type="VOTE"
+              label="VOTE"
+              onClick={() => handleVote(anecdote)}
+            >
+              vote
+            </button>
           </div>
         </div>
       ))}
